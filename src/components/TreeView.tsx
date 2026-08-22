@@ -16,8 +16,12 @@ function TreeNodeItem({ node, depth = 0 }: { node: TreeNode; depth?: number }) {
 
   return (
     <div style={{ marginLeft: depth * 16 }}>
+      {/* Only a node with children toggles, so only that row has to be big
+          enough to tap; leaf rows stay as dense as they were. */}
       <div
-        className="flex items-center gap-1 py-0.5 hover:bg-gray-800/50 rounded cursor-pointer"
+        className={`flex items-center gap-1 py-0.5 hover:bg-gray-800/50 rounded ${
+          hasChildren ? 'cursor-pointer min-h-11 md:min-h-0' : ''
+        }`}
         onClick={() => hasChildren && setExpanded(!expanded)}
       >
         {hasChildren ? (
