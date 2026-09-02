@@ -3,10 +3,238 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JSON Tools - Swiss Army Knife for JSON</title>
+    <title>JSON Tools — format, validate, minify and convert JSON in the browser</title>
+    <meta name="description" content="Paste JSON, get it indented, find the line and column where it breaks, minify it again or turn an array of objects into CSV. Runs entirely in your browser." />
+    <link rel="canonical" href="https://json.alftech.space/" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#030712" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="JSON Tools" />
+    <meta property="og:url" content="https://json.alftech.space/" />
+    <meta property="og:title" content="JSON Tools — format, validate, minify and convert JSON in the browser" />
+    <meta property="og:description" content="Paste JSON, get it indented, find the line and column where it breaks, minify it again or turn an array of objects into CSV. Runs entirely in your browser." />
+    <meta property="og:image" content="https://json.alftech.space/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The JSON Tools formatter tab with its five tabs and an empty input area" />
+    <meta property="og:locale" content="en_US" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="JSON Tools — format, validate, minify and convert JSON in the browser" />
+    <meta name="twitter:description" content="Paste JSON, get it indented, find the line and column where it breaks, minify it again or turn an array of objects into CSV. Runs entirely in your browser." />
+    <meta name="twitter:image" content="https://json.alftech.space/og.png" />
+
+    <script>
+/* Маячок «инструментом воспользовались». Открытая страница — ещё не польза:
+   считается момент, когда человек забрал результат — скопировал его или
+   скачал файл. Один GET /_used за сессию, в обычный лог доступа; никаких
+   кук, никаких внешних сервисов, ничего о самом результате. */
+(function () {
+  var sent = false;
+  window.markToolUsed = function () {
+    if (sent) return;
+    sent = true;
+    try {
+      if (!(navigator.sendBeacon && navigator.sendBeacon('/_used'))) {
+        fetch('/_used', { keepalive: true });
+      }
+    } catch (error) { /* счётчик не важнее инструмента */ }
+  };
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      var write = navigator.clipboard.writeText.bind(navigator.clipboard);
+      navigator.clipboard.writeText = function (text) {
+        window.markToolUsed();
+        return write(text);
+      };
+    }
+  } catch (error) { /* нет клипборда — останутся скачивания */ }
+  document.addEventListener('click', function (event) {
+    var node = event.target;
+    while (node && node.tagName) {
+      if (node.tagName === 'A' && node.hasAttribute('download')) {
+        window.markToolUsed();
+        break;
+      }
+      node = node.parentNode;
+    }
+  }, true);
+})();
+</script>
+<script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "JSON Tools",
+      "url": "https://json.alftech.space/",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Any browser",
+      "browserRequirements": "Requires JavaScript",
+      "description": "A browser-only JSON workbench: a formatter with a choice of indent, a validator that reports the line and column of a parse error, a minifier, a JSON-to-CSV converter and a collapsible tree view.",
+      "image": "https://json.alftech.space/og.png",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+      "featureList": [
+        "Format JSON with a 2, 4 or 8 space indent",
+        "Validate JSON and report the line and column of the error",
+        "Minify JSON",
+        "Convert an array of objects to CSV",
+        "Explore JSON as a collapsible tree"
+      ]
+    }
+    </script>
+
+    <style>
+      /* Текст под приложением. Стили здесь, а не в Tailwind: этот кусок должен
+         быть читаемым в сыром HTML и до того, как загрузится бандл. */
+      body { background: #030712; }
+      .about {
+        max-width: 64rem;
+        margin: 0 auto;
+        padding: 8px 16px 56px;
+        color: #d1d5db;
+        font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      .about h2 {
+        font-size: 22px; line-height: 1.25; font-weight: 700;
+        color: #f9fafb; margin: 40px 0 12px; letter-spacing: -0.01em;
+      }
+      .about h2:first-child { margin-top: 8px; }
+      .about p { margin: 0 0 14px; max-width: 68ch; }
+      /* list-style задан явно: preflight у Tailwind гасит маркеры у ol/ul, а его
+         таблица подключается после этого блока. */
+      .about ul { margin: 0 0 14px; padding-left: 22px; max-width: 68ch; list-style: disc; }
+      .about li { margin-bottom: 9px; }
+      .about b { color: #f9fafb; font-weight: 650; }
+      .about code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.92em; color: #93c5fd;
+      }
+      .about pre {
+        background: #111827; border: 1px solid #1f2937; border-radius: 10px;
+        padding: 14px 16px; overflow-x: auto; margin: 0 0 14px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 13px; line-height: 1.55; color: #e5e7eb;
+      }
+      .about .caption { color: #9ca3af; font-size: 14px; margin: 0 0 6px; }
+      .about a { color: #93c5fd; }
+      .about hr { border: 0; border-top: 1px solid #1f2937; margin: 36px 0 0; }
+      /* Who made it, where the others are, and what could be wrong with it. The
+         line sits here rather than in the app's own footer because this block is
+         below #root and survives the bundle booting, so a crawler and a reader
+         see it in the same place and see it once. A footer link is a tap target
+         like any other, and an inline link is only as tall as its own text, so
+         on a phone the anchors become 44px inline-block boxes. The height goes
+         on the anchors rather than on the paragraph: the line holding one grows,
+         the sentence around it keeps a readable line height instead of being
+         stretched to finger pitch. */
+      .about .colophon {
+        border-top: 1px solid #1f2937; margin: 34px 0 0; padding-top: 14px;
+        color: #9ca3af; font-size: 14px; line-height: 1.65;
+      }
+      .about .colophon p { margin: 0; }
+      .about .colophon p + p { margin-top: 8px; }
+      .about .colophon a {
+        color: #d1d5db; display: inline-block; min-height: 44px; line-height: 44px;
+      }
+      .about .colophon .sep { padding: 0 4px; opacity: 0.45; }
+      @media (min-width: 640px) {
+        .about { padding: 8px 24px 72px; }
+        .about h2 { font-size: 26px; }
+        .about .colophon a { display: inline; min-height: 0; line-height: inherit; }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Постоянный текст, а не заглушка под React: краулер и человек, который
+         долистал до низа, видят ровно одно и то же. -->
+    <article class="about">
+      <hr />
+      <h2>What this does</h2>
+      <p>
+        A reply comes back from someone else's API as one line three screens long, and there is a
+        mistake somewhere in it. JSON Tools lays that line out with indentation, tells you the line
+        and column where the parser gave up, squeezes it back down when you need it small again, and
+        turns an array of objects into CSV. All of it happens in your browser.
+      </p>
+      <p>
+        There is no account, no upload and no server to sign in to. The page loads its own script and
+        stylesheet and then talks to nothing else — what you paste is parsed by the browser's own
+        <code>JSON.parse</code> and never leaves the tab. That also means it keeps working offline
+        once the page is open.
+      </p>
+
+      <h2>The five tabs</h2>
+      <ul>
+        <li>
+          <b>Formatter</b> — re-indents with 2 spaces, 4 spaces or 8, and copies the result to the
+          clipboard in one press.
+        </li>
+        <li>
+          <b>Validator</b> — says whether the text parses. When it does not, it repeats the parser's
+          own message and converts its character offset into a line and column you can jump to in
+          your editor.
+        </li>
+        <li>
+          <b>Minifier</b> — takes formatted JSON and strips every space and newline back out.
+        </li>
+        <li>
+          <b>JSON → CSV</b> — takes an array of objects, uses the union of all their keys as the
+          header row, and leaves a cell empty where an object has no such key. Values containing a
+          comma, a quote or a newline get quoted and their quotes doubled; a nested object or array
+          is written into its cell as JSON. Copy it, or download a <code>.csv</code>.
+        </li>
+        <li>
+          <b>Tree view</b> — walks the whole structure as a collapsible tree, labelling every node
+          object, array, string, number, boolean or null.
+        </li>
+      </ul>
+
+      <h2>What JSON → CSV does with missing keys</h2>
+      <p class="caption">Paste this:</p>
+      <pre>[{"name":"Alice","age":25},{"name":"Bob","city":"Berlin"}]</pre>
+      <p class="caption">and you get this:</p>
+      <pre>name,age,city
+Alice,25,
+Bob,,Berlin</pre>
+      <p>
+        Both objects contribute their keys to the header, and neither row invents a value it does not
+        have. Keys are collected from the top level of each object only — this is a flattener for
+        table-shaped data, not a general nested-to-columns converter.
+      </p>
+
+      <h2>Who it is for</h2>
+      <p>
+        Anyone reading someone else's API response: a developer debugging an integration, a support
+        engineer pasting a log line out of a ticket, an analyst who was handed a JSON export and
+        wants it in a spreadsheet. It assumes you can read JSON — it does not explain the format, it
+        just makes an unreadable blob readable.
+      </p>
+
+      <div class="colophon">
+        <p>JSON Tools by alftech <span class="sep">·</span> more tools at <a href="https://alftech.space/">alftech.space</a></p>
+        <p id="colophon">Your JSON is parsed by this tab and goes nowhere else, which also means nothing here reports a fault back to me — I only find out if you tell me. If a document your own parser accepts is called broken, if a line and column point at the wrong place, or if JSON&nbsp;&rarr;&nbsp;CSV drops a key or mangles a row, write to <a href="mailto:a@alftech.space?subject=json.alftech.space">a@alftech.space</a> and I will fix it.</p>
+      </div>
+    </article>
+
+    <script>
+      /* The donation line is written and switched off: there is no account for
+         it to point at yet. Put that page's address in DONATE_URL and the line
+         appears. That is the only edit.
+
+         The contact line above is plain markup and needs no script; only the
+         switched-off line depends on this one. */
+      var DONATE_URL = '';
+      if (DONATE_URL) {
+        document.getElementById('colophon').insertAdjacentHTML('beforeend',
+          ' <span class="sep">\u00b7</span> <a href="' + DONATE_URL + '" rel="noopener">' +
+          'if it saved you time, buy me a coffee</a>');
+      }
+    </script>
+
   </body>
 </html>

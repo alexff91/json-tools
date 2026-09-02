@@ -1,0 +1,5 @@
+# json.alftech.space
+User-agent: *
+Allow: /
+
+Sitemap: https://json.alftech.space/sitemap.xml
