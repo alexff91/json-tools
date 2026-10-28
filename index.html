@@ -84,67 +84,6 @@
       ]
     }
     </script>
-
-    <style>
-      /* Текст под приложением. Стили здесь, а не в Tailwind: этот кусок должен
-         быть читаемым в сыром HTML и до того, как загрузится бандл. */
-      body { background: #030712; }
-      .about {
-        max-width: 64rem;
-        margin: 0 auto;
-        padding: 8px 16px 56px;
-        color: #d1d5db;
-        font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      }
-      .about h2 {
-        font-size: 22px; line-height: 1.25; font-weight: 700;
-        color: #f9fafb; margin: 40px 0 12px; letter-spacing: -0.01em;
-      }
-      .about h2:first-child { margin-top: 8px; }
-      .about p { margin: 0 0 14px; max-width: 68ch; }
-      /* list-style задан явно: preflight у Tailwind гасит маркеры у ol/ul, а его
-         таблица подключается после этого блока. */
-      .about ul { margin: 0 0 14px; padding-left: 22px; max-width: 68ch; list-style: disc; }
-      .about li { margin-bottom: 9px; }
-      .about b { color: #f9fafb; font-weight: 650; }
-      .about code {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        font-size: 0.92em; color: #93c5fd;
-      }
-      .about pre {
-        background: #111827; border: 1px solid #1f2937; border-radius: 10px;
-        padding: 14px 16px; overflow-x: auto; margin: 0 0 14px;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        font-size: 13px; line-height: 1.55; color: #e5e7eb;
-      }
-      .about .caption { color: #9ca3af; font-size: 14px; margin: 0 0 6px; }
-      .about a { color: #93c5fd; }
-      .about hr { border: 0; border-top: 1px solid #1f2937; margin: 36px 0 0; }
-      /* Who made it, where the others are, and what could be wrong with it. The
-         line sits here rather than in the app's own footer because this block is
-         below #root and survives the bundle booting, so a crawler and a reader
-         see it in the same place and see it once. A footer link is a tap target
-         like any other, and an inline link is only as tall as its own text, so
-         on a phone the anchors become 44px inline-block boxes. The height goes
-         on the anchors rather than on the paragraph: the line holding one grows,
-         the sentence around it keeps a readable line height instead of being
-         stretched to finger pitch. */
-      .about .colophon {
-        border-top: 1px solid #1f2937; margin: 34px 0 0; padding-top: 14px;
-        color: #9ca3af; font-size: 14px; line-height: 1.65;
-      }
-      .about .colophon p { margin: 0; }
-      .about .colophon p + p { margin-top: 8px; }
-      .about .colophon a {
-        color: #d1d5db; display: inline-block; min-height: 44px; line-height: 44px;
-      }
-      .about .colophon .sep { padding: 0 4px; opacity: 0.45; }
-      @media (min-width: 640px) {
-        .about { padding: 8px 24px 72px; }
-        .about h2 { font-size: 26px; }
-        .about .colophon a { display: inline; min-height: 0; line-height: inherit; }
-      }
-    </style>
   </head>
   <body>
     <div id="root"></div>
