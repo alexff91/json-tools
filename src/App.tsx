@@ -88,8 +88,7 @@ function App() {
         <nav><a href="https://regex.alftech.space/">regex</a><a href="https://cron.alftech.space/">cron</a></nav>
       </header>
       <main className="wb-main">
-        <div className="wb-eyebrow">JSON tools · runs in your browser</div>
-        <h1 className="wb-h1">Paste it once. <em>Read</em> it any way.</h1>
+        <h1 className="wb-h1" style={{ marginTop: 0 }}><span className="wb-eyebrow" style={{ display: 'block', marginBottom: 10 }}>JSON formatter & validator · runs in your browser</span>Paste it once. <em>Read</em> it any way.</h1>
         <p className="wb-lede">Checked as you type — and when it breaks, you get the line and column. Then pretty-print it, walk it as a tree, squeeze it to one line, or turn an array into CSV.</p>
 
         <div className="wb-grid2">

@@ -84,9 +84,10 @@
       ]
     }
     </script>
+    <style>.about pre { overflow-x: auto; max-width: 100%; }</style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><!-- The page head as React draws it, so a crawler sees the h1 too; React replaces it on load. --><div class="wb"><header class="wb-top"><a class="wb-brand" href="https://alftech.space/"><i></i>ALFTECH</a></header><main class="wb-main"><h1 class="wb-h1" style="margin-top:0"><span class="wb-eyebrow" style="display:block;margin-bottom:10px">JSON formatter &amp; validator · runs in your browser</span>Paste it once. <em>Read</em> it any way.</h1><p class="wb-lede">Checked as you type — and when it breaks, you get the line and column. Then pretty-print it, walk it as a tree, squeeze it to one line, or turn an array into CSV.</p></main></div></div>
     <script type="module" src="/src/main.tsx"></script>
 
     <!-- Постоянный текст, а не заглушка под React: краулер и человек, который
